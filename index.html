@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Candlestick Viewer</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@3.3.0/dist/chartjs-chart-financial.min.js"></script>
+  <style>
+    body {
+      font-family: Arial;
+      margin: 2rem;
+    }
+    canvas {
+      max-width: 600px;
+    }
+    input {
+      margin: 0.5rem;
+      width: 100px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Single Candlestick Visualizer</h2>
+
+  <div>
+    <label>Open: <input type="number" id="open" value="100.0"></label>
+    <label>High: <input type="number" id="high" value="100.1"></label>
+    <label>Low: <input type="number" id="low" value="95.0"></label>
+    <label>Close: <input type="number" id="close" value="101.0"></label>
+    <button onclick="updateChart()">Draw</button>
+  </div>
+
+  <canvas id="chart" height="300"></canvas>
+
+  <script>
+    const ctx = document.getElementById('chart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'candlestick',
+      data: {
+        datasets: [{
+          label: 'Candle',
+          data: [{
+            x: new Date(), // current time
+            o: 100.0,
+            h: 100.1,
+            l: 95.0,
+            c: 101.0
+          }]
+        }]
+      },
+      options: {
+        scales: {
+          x: {
+            type: 'time',
+            time: {
+              unit: 'minute'
+            }
+          }
+        },
+        plugins: {
+          legend: { display: false }
+        }
+      }
+    });
+
+    function updateChart() {
+      const o = parseFloat(document.getElementById('open').value);
+      const h = parseFloat(document.getElementById('high').value);
+      const l = parseFloat(document.getElementById('low').value);
+      const c = parseFloat(document.getElementById('close').value);
+
+      chart.data.datasets[0].data = [{
+        x: new Date(),
+        o: o,
+        h: h,
+        l: l,
+        c: c
+      }];
+      chart.update();
+    }
+  </script>
+
+</body>
+</html>
