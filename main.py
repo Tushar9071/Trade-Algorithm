@@ -1,8 +1,12 @@
 from patterns.dragonfly_doji import is_dragonfly_doji
-open_price = 100.0
-high_price = 105
-low_price = 95.0
-close_price = 99
 
-result = is_dragonfly_doji(open_price, high_price, low_price, close_price)
-print(f"Is the candle a Dragonfly Doji? {result}")
+
+print("\n=== Test Case 2: Actual Dragonfly Doji ===")
+open_price2 = 95
+high_price2 = 100
+low_price2 = 90.0
+close_price2 = 97
+
+result = is_dragonfly_doji(open_price2, high_price2, low_price2, close_price2)
+
+print(result)
