@@ -1,71 +1,28 @@
 import pandas as pd
-from patterns.dragonfly_doji import is_dragonfly_doji
-from patterns.evening_star import is_evening_star
+from fastapi import FastAPI
 
-print("\n=== Test Case 2: Actual Dragonfly Doji ===")
-open_price2 = 95
-high_price2 = 100
-low_price2 = 90.0
-close_price2 = 97
+app = FastAPI()
 
-result = is_dragonfly_doji(open_price2, high_price2, low_price2, close_price2)
+timeframes = ['1m', '5m', '15m', '30m', '60m']
 
-# print(result)
+@app.get("/")
+def root():
+    return {"message": "Candlestick Pattern API is running. Use /{pattern}/{timeframe} e.g. /hammer/5m"}
 
-
-
-df = pd.read_csv("./assets/merged_dataset/TCS_merged.csv")
-
-# print(df.info())
-
-# Convert candles into dicts and apply rolling window
-# patterns = []
-# for i in range(2, len(df)):
-#     c1 = df.iloc[i-2]
-#     c2 = df.iloc[i-1]
-#     c3 = df.iloc[i]
+def read_pattern_from_csv(pattern: str, tf: str):
+    if tf not in timeframes:
+        return {"error": f"Invalid timeframe: {tf}. Use one of {timeframes}"}
     
-#     candle1 = {'open': c1.open, 'high': c1.high, 'low': c1.low, 'close': c1.close}
-#     candle2 = {'open': c2.open, 'high': c2.high, 'low': c2.low, 'close': c2.close}
-#     candle3 = {'open': c3.open, 'high': c3.high, 'low': c3.low, 'close': c3.close}
-    
-#     if is_evening_star(candle1, candle2, candle3):
-#         patterns.append(True)
-#     else:
-#         patterns.append(False)
+    try:
+        df = pd.read_csv(f"output_patterns_{tf}.csv")
+        if pattern not in df.columns:
+            return {"error": f"Pattern '{pattern}' not found in CSV columns"}
+        return df[df[pattern] == True].to_dict(orient='records')
+    except FileNotFoundError:
+        return {"error": f"CSV for {tf} not found"}
+    except Exception as e:
+        return {"error": str(e)}
 
-# # Add to DataFrame (shift by 2 to align with 3rd candle)
-# df['evening_star'] = [False, False] + patterns
-
-# # Find all rows where the pattern is detected
-# evening_star_rows = df[df['evening_star'] == True]
-
-# # Display the rows
-# print(evening_star_rows)
-
-# import pandas as pd
-from patterns.three_white_soldiers import is_three_white_soldiers
-
-# df = pd.read_csv("your_file.csv")
-
-# Scan for pattern
-soldiers = []
-for i in range(2, len(df)):
-    c1 = df.iloc[i-2]
-    c2 = df.iloc[i-1]
-    c3 = df.iloc[i]
-    
-    candle1 = {'open': c1.open, 'high': c1.high, 'low': c1.low, 'close': c1.close}
-    candle2 = {'open': c2.open, 'high': c2.high, 'low': c2.low, 'close': c2.close}
-    candle3 = {'open': c3.open, 'high': c3.high, 'low': c3.low, 'close': c3.close}
-
-    if is_three_white_soldiers(candle1, candle2, candle3):
-        soldiers.append(True)
-    else:
-        soldiers.append(False)
-
-# Align with third candle
-df['three_white_soldiers'] = [False, False] + soldiers
-
-soldier_signals = df[df['three_white_soldiers'] == True]
-print(soldier_signals)
+@app.get("/{pattern}/{tf}")
+def get_pattern(pattern: str, tf: str):
+    return read_pattern_from_csv(pattern, tf)
