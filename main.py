@@ -1,7 +1,17 @@
 import pandas as pd
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 timeframes = ['1m', '5m', '15m', '30m', '60m']
 
@@ -26,3 +36,9 @@ def read_pattern_from_csv(pattern: str, tf: str):
 @app.get("/{pattern}/{tf}")
 def get_pattern(pattern: str, tf: str):
     return read_pattern_from_csv(pattern, tf)
+
+
+# import pandas as pd
+# df = pd.read_csv('output_patterns_1m.csv')
+
+# print(df)

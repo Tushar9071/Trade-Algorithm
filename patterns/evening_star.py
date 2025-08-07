@@ -1,5 +1,3 @@
-# evening_star.py
-
 def is_evening_star(candle1, candle2, candle3, body_ratio=0.3):
    
     def body_info(c):
@@ -10,6 +8,11 @@ def is_evening_star(candle1, candle2, candle3, body_ratio=0.3):
     body1, dir1 = body_info(candle1)
     body2, dir2 = body_info(candle2)
     body3, dir3 = body_info(candle3)
+
+
+    # print(body1)
+    # print(body2)
+    # print(body3)
 
     if dir1 != 'bullish':
         return False
